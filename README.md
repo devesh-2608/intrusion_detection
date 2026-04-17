@@ -55,4 +55,4 @@ The system takes input data (such as images, video, or processed network represe
 
 ## 👨‍💻 Author
 
-[Your Name]
+Devesh Tripathi
