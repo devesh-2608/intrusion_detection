@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection System - Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .log-image {
+            max-width: 200px;
+            height: auto;
+            cursor: pointer;
+        }
+        .modal-image {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Intrusion Detection System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Cameras</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/logs">Logs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Detection Logs</h2>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <form class="d-flex" method="get">
+                    <select name="category" class="form-select me-2" onchange="this.form.submit()">
+                        <option value="all" {% if request.args.get('category') == 'all' %}selected{% endif %}>All Events</option>
+                        <option value="Entry" {% if request.args.get('category') == 'Entry' %}selected{% endif %}>Entry</option>
+                        <option value="Exit" {% if request.args.get('category') == 'Exit' %}selected{% endif %}>Exit</option>
+                        <option value="Significant Motion" {% if request.args.get('category') == 'Significant Motion' %}selected{% endif %}>Significant Motion</option>
+                    </select>
+                    <input type="date" name="date" class="form-control me-2" value="{{ request.args.get('date', '') }}" onchange="this.form.submit()">
+                    <a href="/export_logs{% if request.args.get('category') != 'all' %}?category={{ request.args.get('category') }}{% endif %}{% if request.args.get('date') %}{% if request.args.get('category') != 'all' %}&{% else %}?{% endif %}date={{ request.args.get('date') }}{% endif %}" class="btn btn-success">Export CSV</a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Logs Table -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Camera</th>
+                        <th>Event Type</th>
+                        <th>Screenshot</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.timestamp|localtime }}</td>
+                        <td>Camera {{ log.camera.id }}</td>
+                        <td>{{ log.event_type }}</td>
+                        <td>
+                            <img src="{{ url_for('serve_screenshot', filename=log.image_path) }}" 
+                                 class="log-image" 
+                                 onclick="showImage(this.src)"
+                                 alt="Screenshot">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Screenshot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" class="modal-image" src="" alt="Screenshot">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showImage(src) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            document.getElementById('modalImage').src = src;
+            modal.show();
+        }
+    </script>
+</body>
+</html> 

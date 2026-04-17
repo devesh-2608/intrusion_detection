@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Camera Grid View</h2>
+    
+    <div class="row">
+        {% for camera in cameras %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ camera.name }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if camera.is_active %}
+                    <div class="camera-feed-container">
+                        <img src="{{ url_for('video_feed', camera_id=camera.id) }}" 
+                             class="img-fluid rounded" 
+                             alt="Camera {{ camera.id }} Feed">
+                    </div>
+                    <div class="mt-2">
+                        <a href="{{ url_for('camera_view', camera_id=camera.id) }}" 
+                           class="btn btn-primary btn-sm">Configure Zone</a>
+                    </div>
+                    {% else %}
+                    <div class="camera-offline">
+                        <div class="offline-message">
+                            <i class="fas fa-video-slash"></i>
+                            <p>Camera Offline</p>
+                            <small class="text-muted">Camera {{ camera.id }} is currently unavailable</small>
+                        </div>
+                        <div class="offline-placeholder">
+                            <img src="https://via.placeholder.com/640x480/2c3e50/ffffff?text=Camera+{{ camera.id }}+Offline" 
+                                 class="img-fluid rounded" 
+                                 alt="Camera {{ camera.id }} Offline">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Camera pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=pagination.prev_num) }}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </span>
+            </li>
+            {% endif %}
+            
+            {% for page_num in pagination.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('index', page=pagination.next_num) }}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Next <i class="fas fa-chevron-right"></i>
+                </span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<style>
+.camera-feed-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.camera-feed-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.camera-offline {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.offline-message {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.offline-message i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #dc3545;
+}
+
+.offline-message p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.offline-placeholder {
+    background: #2c3e50;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.offline-placeholder img {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.8;
+}
+
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-link:hover {
+    background-color: #e9ecef;
+    color: #007bff;
+}
+</style>
+{% endblock %} 

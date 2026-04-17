@@ -1,0 +1,11 @@
+flask==2.3.3
+flask-sqlalchemy==3.1.1
+opencv-python==4.8.0.76
+numpy==1.24.3
+ultralytics==8.0.196
+pandas==2.0.3
+pillow>=6.2.0,<10.0.0
+python-dotenv==1.0.0
+torch==2.0.1
+torchvision==0.15.2
+pytz==2023.3 
